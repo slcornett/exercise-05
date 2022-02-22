@@ -3,6 +3,8 @@ title: "Exercise_05_Challenge_1"
 author: "SLCornett"
 date: "2/21/2022"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r}
@@ -11,7 +13,7 @@ library(mosaic)
 library(dplyr)
 library(ggplot2)
 ```
-Functions in the {mosaic} package have a data= argument as well as a ~ argument that specifies which variable of interest from the data= argument the function is to be applied to.
+Functions in the {mosaic} package have a *data=* argument as well as a *~* argument that specifies which variable of interest from the data= argument the function is to be applied to.
 
 ```{r}
 f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/IMDB-movies.csv"
@@ -25,11 +27,26 @@ df<- d %>% filter(startYear %in% 1920:1979, runtimeMinutes %in% 60:180) %>%
                             startYear %in% 1970:1979~"70s"
                             )
          )
+print(df)
 ```
 Table has 5,651 items
 
 Use {ggplot2} (which is part of {tidyverse}) to plot histograms of the distribution of runtimeMinutes for each decade
 ```{r}
-histogram(~ runtimeMinutes, data = df, xlab = "Runtime (min)")
+# boxplot(runtimeMinutes ~ startYear, data=df, xlab="Decade", ylab="runtime (min)") #test that decade works in general, it does
+p <- ggplot(data = df)  #object built (in theory) -> don't need aes(x, y) here because R gets confused and angry
+p <- p + xlab("Runtime (min)") + ylab("Density") #data labels
+#p <- p + geom_point(na.rm=TRUE) # makes a "scatterplot" that's more a bar graph of dots
+
+#p <- p + histogram(~ decades, data = df$runtimeMinutes, xlab = "Runtime (min)") #incompatable and also just doesn't work with ggplot2, or on its own
+p<- p + geom_histogram(aes(x=runtimeMinutes,#no need y= or stat=identity
+                                    color=factor(decade),
+                                    binwidth = 30,
+                                    na.rm=TRUE
+                                    )) #x, y, alpha, color, fill, linetype, size, weight
+p
+
+p <- p + facet_wrap(~ decade, ncol=4) # wrap data "by" decade into 4 columns
+p
 ```
 
