@@ -1,0 +1,26 @@
+---
+title: "Exercise_05_Challenge_1"
+author: "SLCornett"
+date: "2/21/2022"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/IMDB-movies.csv"
+d <- read_csv(f, col_names = TRUE)
+d %>% filter(startYear %in% 1920:1979, runtimeMinutes %in% 60:180) %>%
+  mutate("decade"=case_when(startYear %in% 1920:1929~"20s",
+                            startYear %in% 1930:1939~"30s",
+                            startYear %in% 1940:1949~"40s",
+                            startYear %in% 1950:1959~"50s",
+                            startYear %in% 1960:1969~"60s",
+                            startYear %in% 1970:1979~"70s"
+                            )
+         )
+```
