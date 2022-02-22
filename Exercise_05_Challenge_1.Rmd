@@ -7,9 +7,11 @@ output: html_document
 
 ```{r}
 library(tidyverse)
+library(mosaic)
 library(dplyr)
 library(ggplot2)
 ```
+Functions in the {mosaic} package have a data= argument as well as a ~ argument that specifies which variable of interest from the data= argument the function is to be applied to.
 
 ```{r}
 f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/IMDB-movies.csv"
@@ -24,3 +26,4 @@ d %>% filter(startYear %in% 1920:1979, runtimeMinutes %in% 60:180) %>%
                             )
          )
 ```
+
