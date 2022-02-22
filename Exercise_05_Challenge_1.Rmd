@@ -16,7 +16,7 @@ Functions in the {mosaic} package have a data= argument as well as a ~ argument 
 ```{r}
 f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/IMDB-movies.csv"
 d <- read_csv(f, col_names = TRUE)
-d %>% filter(startYear %in% 1920:1979, runtimeMinutes %in% 60:180) %>%
+df<- d %>% filter(startYear %in% 1920:1979, runtimeMinutes %in% 60:180) %>%
   mutate("decade"=case_when(startYear %in% 1920:1929~"20s",
                             startYear %in% 1930:1939~"30s",
                             startYear %in% 1940:1949~"40s",
@@ -25,5 +25,11 @@ d %>% filter(startYear %in% 1920:1979, runtimeMinutes %in% 60:180) %>%
                             startYear %in% 1970:1979~"70s"
                             )
          )
+```
+Table has 5,651 items
+
+Use {ggplot2} (which is part of {tidyverse}) to plot histograms of the distribution of runtimeMinutes for each decade
+```{r}
+histogram(~ runtimeMinutes, data = df, xlab = "Runtime (min)")
 ```
 
