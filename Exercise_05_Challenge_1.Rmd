@@ -16,8 +16,8 @@ library(ggplot2)
 Functions in the {mosaic} package have a *data=* argument as well as a *~* argument that specifies which variable of interest from the data= argument the function is to be applied to.
 
 ```{r}
-f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/IMDB-movies.csv"
-d <- read_csv(f, col_names = TRUE)
+f1 <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/IMDB-movies.csv"
+d <- read_csv(f1, col_names = TRUE)
 df<- d %>% filter(startYear %in% 1920:1979, runtimeMinutes %in% 60:180) %>%
   mutate("decade"=case_when(startYear %in% 1920:1929~"20s",
                             startYear %in% 1930:1939~"30s",
@@ -62,6 +62,10 @@ x <- group_by(df, decade) %>%
   summarise(mean=mean(runtimeMinutes, na.rn=TRUE), sd=sd(runtimeMinutes, na.rm=TRUE))
 x
 ```
+Calculate for each decade the standard error around your estimate of the population mean runtimeMinutes based on the standard deviation and sample size (n=100 movies) of your single sample.
+```{r}
+
+```
 
 Compare these estimates to the actual population mean runtimeMinutes for each decade and to the calculated SE in the population mean for samples of size 100 based on the population standard deviation for each decade.
 ```{r}
@@ -77,6 +81,7 @@ Generate a sampling distribution of mean *runtimeMinutes* for each decade by
 reps<- 1000
 n <- 100
 s<-do(reps) * sample_n(group_by(df, decade), n, replace=FALSE) %>%
+  
   group_by(decade) %>% 
   summarise(mean=mean(runtimeMinutes, na.rm=TRUE), sd=sd(runtimeMinutes, na.rm=TRUE))
 s
