@@ -1,0 +1,199 @@
+---
+title: "exercise_05_challenge_2"
+author: "SLCornett"
+date: "2/24/2022"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r}
+library(tidyverse)
+library(mosaic)
+library(dplyr)
+library(ggplot2)
+library(radiant)
+```
+
+1. Using the {tidyverse} read_csv() function, load the “zombies.csv” dataset from this URL as a “tibble” named z. This dataset includes the first and last name and gender of the entire population of 1000 people who have survived the zombie apocalypse and are now ekeing out an existence somewhere on the Gulf Coast, along with several other variables (height, weight, age, number of years of education, number of zombies they have killed, and college major)
+```{r}
+f2<- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/zombies.csv"
+z <- read_csv(f2, col_names = TRUE)
+z #show me the tibble! hello, Tony, where are the nonbinary survivors?
+```
+
+
+
+2. Calculate the population mean and standard deviation for each quantitative (numbers) random variable in the dataset (height, weight, age, number of zombies killed, and years of education).
+```{r}
+zp_mean <- summarize(z, 
+                       mean(height), 
+                       mean(weight), 
+                       mean(age), 
+                       mean(zombies_killed), 
+                       mean(years_of_education)
+                       )
+print(zp_mean)
+
+zp_sd <- summarize(z, 
+                   sdpop(height), 
+                   sdpop(weight), 
+                   sdpop(age), 
+                   sdpop(zombies_killed), 
+                   sdpop(years_of_education)
+                   )
+print(zp_sd)
+```
+
+
+
+3. Use {ggplot} and make boxplots of each of these variables by gender. 1 = height, 2 = weight, 3 = age, 4 = zombies killed, 5 = years of educadtion
+```{r}
+library(cowplot)
+
+#1 gender vs height
+zb1 <- ggplot(data=z, aes(x=gender, y = height))
+zb1 <- zb1 + geom_boxplot(na.rm = TRUE)
+zb1 <- zb1 + theme(axis.text.x=element_text(angle=90))
+zb1 <- zb1 + xlab("gender") + ylab("height")
+
+#2 gender vs weight
+zb2 <- ggplot(data=z, aes(x=gender, y=weight))
+zb2 <- zb2 + geom_boxplot(na.rm = TRUE)
+zb2 <- zb2 + theme(axis.text.x=element_text(angle=90))
+zb2 <- zb2 + xlab("gender") + ylab("weight")
+
+#3 gender vs age
+zb3 <- ggplot(data=z, aes(x=gender, y=age))
+zb3 <- zb3 + geom_boxplot(na.rm = TRUE)
+zb3 <- zb3 + theme(axis.text.x=element_text(angle=90))
+zb3 <- zb3 + xlab("gender") + ylab("age")
+
+#4 gender vs zombois killed
+zb4 <- ggplot(data=z, aes(x=gender, y=zombies_killed))
+zb4 <- zb4 + geom_boxplot(na.rm = TRUE)
+zb4 <- zb4 + theme(axis.text.x=element_text(angle=90))
+zb4 <- zb4 + xlab("gender") + ylab("zombois killed")
+
+#5 gender vs years of education
+zb5 <- ggplot(data=z, aes(x=gender, y=years_of_education))
+zb5 <- zb5 + geom_boxplot(na.rm = TRUE)
+zb5 <- zb5 + theme(axis.text.x=element_text(angle=90))
+zb5 <- zb5 + xlab("gender") + ylab("years of education")
+
+#like facet wrap, but cows!
+plot_grid(zb1, zb2, zb3, zb4, zb5, labels = c('A', 'B', 'C', 'D', 'E'), label_size = 12, nrow = 2)
+```
+
+
+
+4. Use {ggplot} and make scatterplots of height and weight in relation to age (i.e., use age as the x variable), using different colored points for males versus females. (mod 9.6) 
+```{r}
+#age vs height
+zscat1 <- ggplot(data=z, aes(x=age, y=height, color=factor(gender))) #establish plot
+zscat1 <- zscat1 + xlab("age") + ylab("height") #labels 
+zscat1 <- zscat1 + geom_point(na.rm=TRUE) #makes a scatterplot
+zscat1 <- zscat1 + theme(legend.position="bottom", legend.title=element_blank()) #legend location
+zscat1
+
+#age vs weight
+zscat2 <- ggplot(data=z, aes(x=age, y=weight, color=factor(gender))) #establish plot
+zscat2 <- zscat2 + xlab("age") + ylab("weight") #labels 
+zscat2 <- zscat2 + geom_point(na.rm=TRUE) #makes a scatterplot
+zscat2 <- zscat2 + theme(legend.position="bottom", legend.title=element_blank()) #legend location
+zscat2
+
+#cowplot again!
+plot_grid(zscat1, zscat2, labels = c('A', 'B'), label_size = 12, nrow = 2)
+```
+Q: Do these variables seem to be related? In what way? 
+A: yes they do, because both weight and height have a linear relationship with age, both are positively correlated. 
+
+
+
+5. Using histograms and Q-Q plots (quantile-quantile or Q-Q plot), check whether each of the quantitative variables seem to be drawn from a normal distribution. [Q–Q plot is a general graphical method for comparing two probability distributions. To examine a set of data for normality graphically, you plot the quantiles for your actual data (as the y values) versus theoretical quantiles (as the x values) pulled from a normal distribution. If the two distributions being compared are similar, the points in the plot should lie approximately on the line y = x.]
+1 = height, 2 = weight, 3 = age, 4 = zombies killed, 5 = years of educadtion
+```{r}
+#HISTOGRAM
+#1 height
+zq1 <- ggplot(data = z) #just the data because r has feelings
+zq1<- zq1 + geom_histogram(aes(x=height, binwidth = 30))
+zq1<- zq1 + ggtitle("Height")
+
+#2 weight
+zq2 <- ggplot(data = z) #just the data because r has feelings
+zq2<- zq2 + geom_histogram(aes(x=weight, binwidth = 30))
+zq2<- zq2 + ggtitle("Weight")
+
+#3 age
+zq3 <- ggplot(data = z) #just the data because r has feelings
+zq3<- zq3 + geom_histogram(aes(x=age, binwidth = 30))
+zq3<- zq3 + ggtitle("Age")
+
+#4 Zombies Killed
+zq4 <- ggplot(data = z) #just the data because r has feelings
+zq4<- zq4 + geom_histogram(aes(x=zombies_killed, binwidth = 30))
+zq4<- zq4 + ggtitle("Zombois Killed")
+
+#5 Years of Education
+zq5 <- ggplot(data = z) #just the data because r has feelings
+zq5<- zq5 + geom_histogram(aes(x=years_of_education, binwidth = 30)) #not sure why the bars are so narrow. decreasing the bin size did not help.
+zq5<- zq5 + ggtitle("Years of Edu")
+
+#cowplot again! AGAIN!
+plot_grid(zq1, zq2, zq3, zq4, zq5, labels = c('A', 'B', 'C', 'D', 'E'), label_size = 12, nrow = 2)
+
+#Q-Q PLOTS
+library(car)
+library(ggpubr)
+#6 height
+#zq6<- qqPlot(z$height) #qq_lot, not qqplot. couldn't figure out how tot get qqplot or qqnorm to work. looked at module 9 and 13
+zq6<-ggqqplot(z$height, title = "Height") #does the same as qqPlot() but looks nicer? and allows a title
+
+#7 weight
+zq7<-ggqqplot(z$weight, title = "Weight")
+
+#8 age
+zq8 <-ggqqplot(z$age, title = "Age")
+
+#9 Zombies Killed
+zq9 <-ggqqplot(z$zombies_killed, title = "Zombies Killed")
+
+#10 Years of Education
+zq10<- ggqqplot(z$years_of_education, title = "Years of Education")
+
+#plotting qq plots and histograms together
+plot_grid(zq1, zq2, zq3,zq6, zq7, zq8, label_size = 12, nrow = 2)
+plot_grid(zq4, zq5, zq9, zq10, label_size = 12, nrow = 2)
+```
+Q: Which seem to be quantitative variables seem to be drawn from a normal distribution, and which do not?
+A: height, weight, and age seem to be normally distributed. This makes sense because they are linear variables. Zombies killed and years of education are not normally distributed, so must be plotted with something other than a normal distribution. 
+
+
+
+6. Now use the sample_n() function from {dplyr} to sample ONE subset of 50 zombie apocalypse survivors (without replacement) from this population and calculate the mean and sample standard deviation for each variable. 
+Also estimate the standard error for each variable based on this one sample and use that to construct the theoretical 95% confidence interval for each mean. You can use either the standard normal or a Student’s t distribution to derive the critical values needed to calculate the lower and upper limits of the CI.
+```{r}
+
+```
+
+
+
+7. Then draw another 199 random samples of 50 zombie apocalypse survivors out and calculate the mean for each of the these samples. Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 50 observations), which constitutes a sampling distribution for each variable. 
+```{r}
+
+```
+What are the means and standard deviations of the sampling distribution for each variable?
+
+
+
+8. Finally, construct a 95% confidence interval for each mean directly from the sampling distribution of sample means using the central 95% that distribution (i.e., by setting the lower and upper CI bounds to 2.5% and 97.5% of the way through that distribution).
+```{r}
+
+```
+
+
+How do the standard deviations of the sampling distribution for each variable compare to the standard errors estimated from your first sample of size 50? What do sampling distributions for each variable mean look like? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution? How do the two 95% CIs you estimated compare to one another (i.e., the CI based on one sample and the corresponding sample standard deviation versus the CI based on simulation where you created a sampling distribution across 200 samples)?
+```{r}
+
+```
+
