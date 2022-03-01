@@ -185,9 +185,9 @@ survivors50<-tibble(variable=character(), s1_mean=numeric(), s1_sd=numeric(), s1
 for (i in seq_along(y)){
   z_m<-mean(y[[i]])
   z_sd<-sd(y[[i]])
-  z_se<-sd/sqrt(50) #this is throwing an error, preventing knitting
-  z_lower_ci<- m+qnorm(0.5/2)*se #calculate the lower limit
-  z_upper_ci<- m-qnorm(0.5/2)*se #calculate the upper limit
+  z_se<-z_sd/sqrt(50) #this is throwing an error, preventing knitting
+  z_lower_ci<- z_m+qnorm(0.5/2)*z_se #calculate the lower limit
+  z_upper_ci<- z_m-qnorm(0.5/2)*z_se #calculate the upper limit
   survivors50<-add_row(survivors50, variable=(colnames(y)[i]), s1_mean=z_m, s1_sd=z_sd, s1_se=z_se, s1_lower_ci=z_lower_ci, s1_upper_ci=z_upper_ci)
 }
 survivors50 #stats of the 50 sampled
@@ -305,7 +305,6 @@ zCI <- tibble(
   #zombies_killed_CI,
   #Yrs_Edu_CI,
 )
-
 zCI
 ```
 
