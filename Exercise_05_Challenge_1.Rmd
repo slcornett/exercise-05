@@ -52,9 +52,9 @@ p
 #actual population
 results <- group_by(df, decade)%>%
   summarise(
-    p_mean=mean(runtimeMinutes, na.rn=TRUE), #population mean
-    p_sd=sd(runtimeMinutes, na.rm=TRUE), #population sd
-    p_se=p_sd/sqrt(100) #se
+    pop_mean=mean(runtimeMinutes, na.rn=TRUE), #population mean
+    pop_sd=sd(runtimeMinutes, na.rm=TRUE), #population sd
+    pop_se=pop_sd/sqrt(100) #se
     )
 print(results) # population mean, standard deviation, standard error
 ```
@@ -92,31 +92,66 @@ print(comparison_1) #prints the left-joined tables of x and results
 reps<- 1000 # draw 1000 samples
 n <- 100 # each sample is 100 movies
 #[b]
-samp_dist<-do(reps) * sample_n(group_by(df, decade), n, replace=FALSE) %>% #group by decade to sample
-  group_by(decade) %>%  # group by sample in results
-  summarise(samp_dist_mean=mean(~runtimeMinutes, na.rm=TRUE), #sampling distrib mean
-            samp_dist_sd=sd(~runtimeMinutes, na.rm=TRUE)) #sampling distrib sd
+samp_dist<-do(reps) * sample_n(group_by(df, decade),
+                              n, replace=FALSE) %>% #group by decade to sample
+                              group_by(decade) %>%  # group by sample in results
+                              summarise(
+                                samp_dist_mean = mean(~runtimeMinutes, na.rm=TRUE), #sampling distrib mean
+                                samp_dist_sd = sd(~runtimeMinutes, na.rm=TRUE)
+                                ) #sampling distrib sd
 samp_dist #print s
+
+#below seems incorrect, as it re-writes my samp_dist 
+#generate sampling distribution 
+#samp_dist <- {do(reps) * sample_n(df, n, replace = FALSE)} %>%
+  #group_by(decade, .index) %>%
+  #summarise('mean(runtumeMinutes)' = mean(runtimeMinutes))
 ```
+
+
 
 8. [A] calculate the *MEAN* and the *STANDARD DEVIATION* of the Sampling Distribution of sample means for each decade (the former should be a very good estimate of the population mean, while the latter is another estimate of the standard error in our estimate of the population mean for a particular sample size) and [B] plot a histogram of the sampling distribution for each decade. What shape does it have?
 ```{r}
+
+# mean(~ samp_dist_mean, data = samp_dist) #calculates the mean for nothing because it does not work.
 #A
-mean(~ samp_dist_mean, data=samp_dist) #calculates the mean for 
+samp_distDecMeans <- aggregate(samp_dist_mean~decade, mean, data = samp_dist)
+samp_distDecMeans
+
+samp_distDecSDs <- aggregate(samp_dist$samp_dist_mean, by = list(samp_dist$decade), FUN = sd) 
+samp_distDecSDs #sd by decade from samp_dist (random sample of 100, 1000 times)
+
+names(samp_distDecSDs)[names(samp_distDecSDs)=="Group.1"]<- "decade" #change column name in samp_dist_DecSDs
+names(samp_distDecSDs)[names(samp_distDecSDs)=="x"] <- "samp_dist_sd" #change column name in samp_dist_DecSDs
+
+merge_samp_dist <- left_join(samp_distDecMeans, samp_distDecSDs, by = "decade")
 
 #B
-
-ggplot(data = samp_dist, aes(x=samp_dist_mean)) + geom_histogram() + facet_wrap(~decade)
+#histogram()
+#samp_dist_hist <- ggplot(data = samp_dist, aes("mean_runtimeMinutes"))
+#samp_dist_hist <-
+  
+samp_dist_hist <- ggplot(data = samp_dist, aes(x = samp_dist_mean)) + geom_histogram() + facet_wrap(~decade) #grey histogram
+samp_dist_hist
 ```
 A: normal distribution, shaped like the empire state building. 
 
 
 9. Finally, compare the standard error in *runtimeMinutes* for samples of size 100 from each decade 
-[1] as estimated from your first sample of 100 movies, 
-[2] as calculated from the known population standard deviations for each decade, and 
-[3] as estimated from the sampling distribution of sample means for each decade.
+[1] as estimated from your first sample of 100 movies, [2] as calculated from the known population standard deviations for each decade, and [3] as estimated from the sampling distribution of sample means for each decade.
 ```{r}
+# n = sample size 
+SE_20s <- (samp_distDecMeans[1,2])/sqrt(reps)
+SE_30s <- (samp_distDecMeans[2,2])/sqrt(reps)
+SE_40s <- (samp_distDecMeans[3,2])/sqrt(reps)
+SE_50s <- (samp_distDecMeans[4,2])/sqrt(reps)
+SE_60s <- (samp_distDecMeans[5,2])/sqrt(reps)
+SE_70s <- (samp_distDecMeans[6,2])/sqrt(reps)
+decade <- c("20s", "30s", "40s", "50s", "60s", "70s")
+samp_distSE <- c(SE_20s, SE_30s, SE_40s, SE_50s, SE_60s, SE_70s)
+samp_distSEs <- data.frame(decade, samp_distSE) 
 
+comparison_2 <- left_join(comparison_1, samp_distSEs, by = "decade") %>%
+  select(decade, pop_se, samp_se, samp_distSE)
+comparison_2
 ```
-
-
