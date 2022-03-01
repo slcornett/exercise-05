@@ -74,8 +74,8 @@ x #prints the results
 ```{r}
 #actual population = results
 #SE calculation pop of sample of 100 = x
-comparison <- left_join(x, results, by = "decade") #merge also works (module 10)
-print(comparison) #prints the left-joined tables of x and results
+comparison_1 <- left_join(x, results, by = "decade") #merge also works (module 10)
+print(comparison_1) #prints the left-joined tables of x and results
 
 #also works: Merge {dyplyr}
 #comparison_1 <- merge(x, results, by = "decade")
@@ -88,12 +88,14 @@ print(comparison) #prints the left-joined tables of x and results
 -> Use either the do(reps) * formulation from {mosaic}, the rerun() function from {purrr}, or the rep_sample_n() workflow from {infer} to generate your these sampling distributions (see Module 12)
 ```{r}
 #runtimeMinutes sampling distribution (samp_dist = s from assignment)
-reps<- 1000
-n <- 100
+#[a]
+reps<- 1000 # draw 1000 samples
+n <- 100 # each sample is 100 movies
+#[b]
 samp_dist<-do(reps) * sample_n(group_by(df, decade), n, replace=FALSE) %>% #group by decade to sample
   group_by(decade) %>%  # group by sample in results
-  summarise(samp_dist_mean=mean(runtimeMinutes, na.rm=TRUE), #sampling distrib mean
-            samp_dist_sd=sd(runtimeMinutes, na.rm=TRUE)) #sampling distrib sd
+  summarise(samp_dist_mean=mean(~runtimeMinutes, na.rm=TRUE), #sampling distrib mean
+            samp_dist_sd=sd(~runtimeMinutes, na.rm=TRUE)) #sampling distrib sd
 samp_dist #print s
 ```
 
@@ -103,6 +105,7 @@ samp_dist #print s
 mean(~ samp_dist_mean, data=samp_dist) #calculates the mean for 
 
 #B
+
 ggplot(data = samp_dist, aes(x=samp_dist_mean)) + geom_histogram() + facet_wrap(~decade)
 ```
 A: normal distribution, shaped like the empire state building. 

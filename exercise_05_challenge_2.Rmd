@@ -170,30 +170,179 @@ A: height, weight, and age seem to be normally distributed. This makes sense bec
 
 
 
-6. Now use the sample_n() function from {dplyr} to sample ONE subset of 50 zombie apocalypse survivors (without replacement) from this population and calculate the mean and sample standard deviation for each variable. 
-Also estimate the standard error for each variable based on this one sample and use that to construct the theoretical 95% confidence interval for each mean. You can use either the standard normal or a Student’s t distribution to derive the critical values needed to calculate the lower and upper limits of the CI.
+6. Now use the sample_n() function from {dplyr} to [1] sample ONE subset of 50 zombie apocalypse survivors (without replacement) from this population and [2] calculate the mean and [3] sample standard deviation for each variable. [4] Also estimate the standard error for each variable based on this one sample and use that to construct the theoretical 95% confidence interval for each mean. You can use either the standard normal or a Student’s t distribution to derive the critical values needed to calculate the lower and upper limits of the CI.
 ```{r}
+#module 14.3
+#sampling sample 
+set.seed(1) #randomly picking from the sample one time
+n1<-50 #total population size
+s1<-sample_n(z, size=n1, replace=FALSE) #sample 1 subset of z (zombie survivors) no replacement, distribution
+y<-select(s1, height, weight, age, zombies_killed, years_of_education) #sample of population
 
+survivors50<-tibble(variable=character(), s1_mean=numeric(), s1_sd=numeric(), s1_se=numeric(), s1_lower_ci = numeric(), s1_upper_ci=numeric()) #make it a tibble for storing data from the 50 survivors
+
+#loop for processing each quantitative variable in z, calculating its mean, sd, and se
+for (i in seq_along(y)){
+  z_m<-mean(y[[i]])
+  z_sd<-sd(y[[i]])
+  z_se<-sd/sqrt(50) #this is throwing an error, preventing knitting
+  z_lower_ci<- m+qnorm(0.5/2)*se #calculate the lower limit
+  z_upper_ci<- m-qnorm(0.5/2)*se #calculate the upper limit
+  survivors50<-add_row(survivors50, variable=(colnames(y)[i]), s1_mean=z_m, s1_sd=z_sd, s1_se=z_se, s1_lower_ci=z_lower_ci, s1_upper_ci=z_upper_ci)
+}
+survivors50 #stats of the 50 sampled
 ```
 
 
 
-7. Then draw another 199 random samples of 50 zombie apocalypse survivors out and calculate the mean for each of the these samples. Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 50 observations), which constitutes a sampling distribution for each variable. 
+7. Then draw another 199 random samples of 50 zombie apocalypse survivors out and calculate the mean for each of the these samples. 
+Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 50 observations), which constitutes a sampling distribution for each variable. 
 ```{r}
+#is 100 supposed to be 200?
+set.seed(1) 
+n2<-199 #sampling 50 from z, running these calculations
+
+ #height_mean=do(~z$height, n2)
+ #weight_mean=do(n2)
+ #age_mean=do(n2)
+ #zombiesK_mean=do(n2)
+ #ed_mean=do(n2)
+
+survivors199<- tibble(
+  z_seq = c(1:199),
+  height_mean = do(n2)*mean(~height, data = sample_n(z, size= n1, replace = FALSE)),
+  weight_mean = do(n2)*mean(~weight, data = sample_n(z, size= n1, replace = FALSE)),
+  age_mean = do(n2)*mean(~age, data=sample_n(z, size= n1, replace = FALSE)),
+  zombieK_mean = do(n2)*mean(~zombies_killed, data=sample_n(z, size= n1, replace = FALSE)),
+  edu_mean = do(n2)*mean(~years_of_education, data=sample_n(z, size= n1, replace = FALSE))
+)
+survivors199
+```
+Q: What are the means and standard deviations of the sampling distribution for each variable?
+Means of sampling distrubution
+```{r}
+#need to index by survivors50
+h_meanDist <-mean(~mean, data=(survivors199$height_mean)+survivors50[[1,2]])
+h_meanDist
+
+w_meanDist <-mean(~mean, data=(survivors199$weight_mean)+survivors50[[2,2]])
+w_meanDist
+
+a_meanDist <-mean(~mean, data=(survivors199$age_mean)+survivors50[[3,2]])
+a_meanDist
+
+zk_meanDist <-mean(~mean, data=(survivors199$zombieK_mean)+survivors50[[4,2]])
+zk_meanDist
+
+edu_meanDist <-mean(~mean, data=(survivors199$edu_mean)+survivors50[[5,2]])
+edu_meanDist
 
 ```
-What are the means and standard deviations of the sampling distribution for each variable?
+Standard Deviations of sampling distributions
+```{r}
+h_meanSD <-sd(~mean, data = (survivors199$height_mean) + survivors50[[1,2]])
+h_meanSD
+
+w_meanSD <-sd(~mean, data = (survivors199$weight_mean) + survivors50[[2,2]])
+w_meanSD
+
+a_meanSD <-sd(~mean, data = (survivors199$age_mean) + survivors50[[3,2]])
+a_meanSD
+
+zk_meanSD <-sd(~mean, data = (survivors199$zombieK_mean) + survivors50[[4,2]])
+zk_meanSD
+
+edu_meanSD <-sd(~mean, data = (survivors199$edu_mean) + survivors50[[5,2]])
+edu_meanSD
+
+z_distSD<- c(h_meanSD, w_meanSD, a_meanSD, zk_meanSD, edu_meanSD)
+```
 
 
 
 8. Finally, construct a 95% confidence interval for each mean directly from the sampling distribution of sample means using the central 95% that distribution (i.e., by setting the lower and upper CI bounds to 2.5% and 97.5% of the way through that distribution).
 ```{r}
+#mean(x) + c(qnorm(0.025), qnorm(0.975) * sd(x)/sqrt(length(x)))
+# (ci <- c(lower, upper))
+z_percent_ci <- 95
+z_alpha <- 1 - z_percent_ci/100 # alpha = 0.05
+# _lowerCI = where qnorm(alpha /2) is the 2.5% quantile of the standard normal distribution
+# _upperCI = where qnorm(1 - alpha / 2) is the 97.5% quantile of the standard normal distribution
 
+#height
+h_lowerCI <- h_meanDist+qnorm(z_alpha/2) * h_meanSD 
+h_upperCI <- h_meanDist + qnorm(1-z_alpha/2) * h_meanSD 
+height_CI <- c(h_lowerCI, h_upperCI)
+
+#weight
+w_lowerCI <- w_meanDist+qnorm(z_alpha/2) * w_meanSD
+w_upperCI <- w_meanDist + qnorm(1-z_alpha/2) * w_meanSD
+weight_CI <- c(w_lowerCI, w_upperCI)
+
+#age
+a_lowerCI <- a_meanDist+qnorm(z_alpha/2) * a_meanSD
+a_upperCI <- a_meanDist + qnorm(1-z_alpha/2) * a_meanSD
+age_CI <- c(a_lowerCI, a_upperCI)
+
+#zombies killed
+zk_lowerCI <- zk_meanDist+qnorm(z_alpha/2) * zk_meanSD
+zk_upperCI <- zk_meanDist + qnorm(1-z_alpha/2) * zk_meanSD
+zombies_killed_CI <- c(zk_lowerCI, zk_upperCI)
+
+#years of education
+edu_lowerCI <- edu_meanDist+qnorm(z_alpha/2) * edu_meanSD
+edu_upperCI <- edu_meanDist + qnorm(1-z_alpha/2) * edu_meanSD
+Yrs_Edu_CI <- c(edu_lowerCI, edu_upperCI)
+
+
+zCI <- tibble(
+  "Lower CI" = c(h_lowerCI, w_lowerCI, a_lowerCI, zk_lowerCI, edu_lowerCI), 
+  "Upper CI" = c(h_upperCI, w_upperCI, a_upperCI, zk_upperCI, edu_upperCI)
+  #"Confidence Interval" = c("Lower CI", "Upper CI"),
+  #height_CI,
+  #weight_CI,
+  #age_CI,
+  #zombies_killed_CI,
+  #Yrs_Edu_CI,
+)
+
+zCI
 ```
 
 
-How do the standard deviations of the sampling distribution for each variable compare to the standard errors estimated from your first sample of size 50? What do sampling distributions for each variable mean look like? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution? How do the two 95% CIs you estimated compare to one another (i.e., the CI based on one sample and the corresponding sample standard deviation versus the CI based on simulation where you created a sampling distribution across 200 samples)?
-```{r}
 
+9. [A] How do the standard deviations of the sampling distribution for each variable compare to the standard errors estimated from your first sample of size 50? A: the s1_se and sampling distributions for each variable look similar. 
+**Note: not sure how to code this comparison like i did in challenge 1 for question 6. nOpe, nevermind**
+```{r}
+survivors50SE <- survivors50[ , c(1,4)]
+survivors50SE
+comparison_3 <- add_column(survivors50SE, z_distSD)
+comparison_3 
+```
+
+
+[B] What do sampling distributions for each variable mean look like? A: they all look like relatively normal distributions, even those non-linear variables that didn't have normal distributions when previously plotted as histograms.
+```{r}
+#history
+histogram(~ mean, data = survivors199$height_mean, main = "Height Sampling Distribution Mean")
+#weight
+histogram(~ mean, data = survivors199$weight_mean, main = "Weight Sampling Distribution Mean")
+#age
+histogram(~ mean, data = survivors199$age_mean, main = "Age Sampling Distribution Mean")
+#zombies killed
+histogram(~ mean, data = survivors199$zombieK_mean, main = "Zombies Killed Sampling Distribution Mean")
+#years of education
+histogram(~ mean, data = survivors199$edu_mean, main = "Years of Education Sampling Distribution Mean")
+```
+**Note: i would use cowplot to put these all together, but cowplot is very slow**
+
+[C] Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution? **A: Because we are plotting the distribution of means, the quantitative variables that are not linear (zombies killed and years of education) have been linearized as now they are plotted respectively as their mean number of occurrences.**
+
+[D] How do the two 95% CIs you estimated compare to one another (i.e., the CI based on one sample and the corresponding sample standard deviation versus the CI based on simulation where you created a sampling distribution across 200 samples)?
+```{r}
+survivors50CI <- survivors50[ , c(5,6)]
+survivors50CI
+comparison_4<- add_column(zCI, survivors50CI)
+comparison_4
 ```
 
