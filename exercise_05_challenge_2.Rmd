@@ -210,11 +210,11 @@ n2<-199 #sampling 50 from z, running these calculations
 
 survivors199<- tibble(
   z_seq = c(1:199),
-  height_mean = do(n2) * mean(~height, data = sample_n(z, size= n1, replace = FALSE)),
-  weight_mean = do(n2) * mean(~weight, data = sample_n(z, size= n1, replace = FALSE)),
+  height_mean = do(n2) * mean(~height, data = sample_n(z, size = n1, replace = FALSE)),
+  weight_mean = do(n2) * mean(~weight, data = sample_n(z, size = n1, replace = FALSE)),
   age_mean = do(n2) * mean(~age, data = sample_n(z, size = n1, replace = FALSE)),
-  zombieK_mean = do(n2) * mean(~zombies_killed, data = sample_n(z, size= n1, replace = FALSE)),
-  edu_mean = do(n2) * mean(~years_of_education, data = sample_n(z, size= n1, replace = FALSE))
+  zombieK_mean = do(n2) * mean(~zombies_killed, data = sample_n(z, size = n1, replace = FALSE)),
+  edu_mean = do(n2) * mean(~years_of_education, data = sample_n(z, size = n1, replace = FALSE))
 )
 survivors199
 ```
