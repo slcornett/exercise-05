@@ -25,6 +25,7 @@ z #show me the tibble! hello, Tony, where are the nonbinary survivors?
 
 2. Calculate the population mean and standard deviation for each quantitative (numbers) random variable in the dataset (height, weight, age, number of zombies killed, and years of education).
 ```{r}
+
 zp_mean <- summarize(z, 
                        mean(height), 
                        mean(weight), 
