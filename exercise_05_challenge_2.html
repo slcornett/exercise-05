@@ -255,6 +255,15 @@ library(radiant)</code></pre>
 <pre><code>## Loading required package: radiant.basics</code></pre>
 <pre><code>## Loading required package: radiant.model</code></pre>
 <pre><code>## Loading required package: radiant.multivariate</code></pre>
+<pre class="r"><code>library(cowplot)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;cowplot&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:lubridate&#39;:
+## 
+##     stamp</code></pre>
+<pre><code>## The following object is masked from &#39;package:mosaic&#39;:
+## 
+##     theme_map</code></pre>
 <ol style="list-style-type: decimal">
 <li>Using the {tidyverse} read_csv() function, load the “zombies.csv” dataset from this URL as a “tibble” named z. This dataset includes the first and last name and gender of the entire population of 1000 people who have survived the zombie apocalypse and are now ekeing out an existence somewhere on the Gulf Coast, along with several other variables (height, weight, age, number of years of education, number of zombies they have killed, and college major)</li>
 </ol>
@@ -314,16 +323,9 @@ print(zp_sd)</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Use {ggplot} and make boxplots of each of these variables by gender. 1 = height, 2 = weight, 3 = age, 4 = zombies killed, 5 = years of educadtion</li>
 </ol>
-<pre class="r"><code>library(cowplot)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;cowplot&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:lubridate&#39;:
-## 
-##     stamp</code></pre>
-<pre><code>## The following object is masked from &#39;package:mosaic&#39;:
-## 
-##     theme_map</code></pre>
-<pre class="r"><code>#1 gender vs height
+<pre class="r"><code>library(cowplot)
+
+#1 gender vs height
 zb1 &lt;- ggplot(data=z, aes(x=gender, y = height))
 zb1 &lt;- zb1 + geom_boxplot(na.rm = TRUE)
 zb1 &lt;- zb1 + theme(axis.text.x=element_text(angle=90))

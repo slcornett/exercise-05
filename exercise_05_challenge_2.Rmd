@@ -12,6 +12,7 @@ library(mosaic)
 library(dplyr)
 library(ggplot2)
 library(radiant)
+library(cowplot)
 ```
 
 1. Using the {tidyverse} read_csv() function, load the “zombies.csv” dataset from this URL as a “tibble” named z. This dataset includes the first and last name and gender of the entire population of 1000 people who have survived the zombie apocalypse and are now ekeing out an existence somewhere on the Gulf Coast, along with several other variables (height, weight, age, number of years of education, number of zombies they have killed, and college major)
