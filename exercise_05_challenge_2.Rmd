@@ -210,7 +210,7 @@ n2<-199 #sampling 50 from z, running these calculations
  #zombiesK_mean=do(n2)
  #ed_mean=do(n2)
 
-survivors199<- tibble(
+survivors199<- tibble( #Notes from Tony 03/03/22:  you are not drawing out the same set of 199 survivors for each variable but rather different sets of 199 survivors for each, which would break any kind of relationship among the variables. That's fine if you're doing a randomization test, but not for this :D
   z_seq = c(1:199),
   height_mean = do(n2) * mean(~height, data = sample_n(z, size = n1, replace = FALSE)),
   weight_mean = do(n2) * mean(~weight, data = sample_n(z, size = n1, replace = FALSE)),
@@ -264,6 +264,8 @@ z_distSD<- c(h_meanSD, w_meanSD, a_meanSD, zk_meanSD, edu_meanSD)
 
 8. Finally, construct a 95% confidence interval for each mean directly from the sampling distribution of sample means using the central 95% that distribution (i.e., by setting the lower and upper CI bounds to 2.5% and 97.5% of the way through that distribution).
 ```{r}
+#Notes from Tony (03/03/22): in line 265+, when you find CIs, you are not actually getting the CIs for each "mean directly from the sampling distribution of sample means" but rather you're calculating the theoretical CI based on a normal dist
+
 #mean(x) + c(qnorm(0.025), qnorm(0.975) * sd(x)/sqrt(length(x)))
 # (ci <- c(lower, upper))
 z_percent_ci <- 95
@@ -341,6 +343,8 @@ histogram(~ mean, data = survivors199$edu_mean, main = "Years of Education Sampl
 
 [D] How do the two 95% CIs you estimated compare to one another (i.e., the CI based on one sample and the corresponding sample standard deviation versus the CI based on simulation where you created a sampling distribution across 200 samples)?
 ```{r}
+#notes from Tony 03/03/22: finally, your last comparison didn't run correctly for me.
+
 survivors50CI <- survivors50[ , c(5,6)] #indexing to re-orient table so compatible with zCI table
 survivors50CI
 comparison_4<- add_column(zCI, survivors50CI)

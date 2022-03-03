@@ -140,6 +140,8 @@ A: normal distribution, shaped like the empire state building.
 9. Finally, compare the standard error in *runtimeMinutes* for samples of size 100 from each decade 
 [1] as estimated from your first sample of 100 movies, [2] as calculated from the known population standard deviations for each decade, and [3] as estimated from the sampling distribution of sample means for each decade.
 ```{r}
+#Notes from Tony 03/03/22:  I think you don't calculate the SE as estimated from the sampling distribution of sample means for each decade correctly, and in line 97, you're directly taking the mean of the runtime of 100,000 movies instead of the mean of 1000 sample means that are each based on 100 movies. in this case, the values are the same (I think), but if sample sizes varied, then the former wouldn't be the same
+
 # n = sample size 
 SE_20s <- (samp_distDecMeans[1,2])/sqrt(reps)
 SE_30s <- (samp_distDecMeans[2,2])/sqrt(reps)
